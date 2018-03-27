@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="501.0" prefWidth="320" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jarvia.jarvia.FXMLController">
+    <children>
+        <Label fx:id="jarviA_talk" layoutX="47.0" layoutY="466.0" minHeight="16" minWidth="69" prefHeight="25.0" prefWidth="149.0" />
+      <ScrollPane layoutX="46.0" layoutY="14.0" prefHeight="432.0" prefWidth="228.0">
+         <content>
+            <Label fx:id="label2" maxHeight="1.7976931348623157E308" prefWidth="207.0" textAlignment="JUSTIFY" />
+         </content>
+      </ScrollPane>
+      <Button fx:id="micro_speech" layoutX="120.0" layoutY="454.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="81.0" text="Talk" />
+    </children>
+</AnchorPane>

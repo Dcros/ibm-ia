@@ -1,0 +1,203 @@
+package com.jarvia.jarvia;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import com.ibm.watson.developer_cloud.http.HttpMediaType;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.RecognizeOptions;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechRecognitionResults;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.BaseRecognizeCallback;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.TargetDataLine;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import com.sun.speech.freetts.Voice;
+import com.sun.speech.freetts.VoiceManager;
+
+public class FXMLController implements Initializable {
+    @FXML
+    private Label jarviA_talk;
+    @FXML
+    private Button micro_speech;
+    @FXML
+    private Label label2;
+    public String TextoTemporal;
+    VoiceManager vm;
+    Voice v;
+    
+    @FXML
+    public void handleButtonAction(ActionEvent event) throws InterruptedException, LineUnavailableException, Exception {
+        micro_speech.setDisable(true);
+        com.jarvia.jarvia.SpeechToText service = new com.jarvia.jarvia.SpeechToText();
+        service.setUsernameAndPassword("bf118679-d704-43ed-a49b-cbfa01fcdfd3", "yZUzl4WSUpLC");
+
+        // Signed PCM AudioFormat with 16kHz, 16 bit sample size, mono
+        int sampleRate = 16000;
+        AudioFormat format = new AudioFormat(sampleRate, 16, 1, true, false);
+        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+
+        if (!AudioSystem.isLineSupported(info)) {
+          System.out.println("Line not supported");
+          System.exit(0);
+        }
+
+        TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
+        line.open(format);
+        line.start();
+
+        AudioInputStream audio = new AudioInputStream(line);
+
+        RecognizeOptions options = new RecognizeOptions.Builder()
+          .interimResults(true)
+        //.inactivityTimeout(5) // use this to stop listening when the speaker pauses, i.e. for 5s
+          .audio(audio)
+          .contentType(HttpMediaType.AUDIO_RAW + "; rate=" + sampleRate)
+          .build();
+
+        service.recognizeUsingWebSocket(options, new BaseRecognizeCallback() {
+          @Override
+          public void onTranscription(SpeechRecognitionResults speechResults) {
+            JSONObject myjson = new JSONObject(speechResults);
+            JSONArray the_json_array = myjson.getJSONArray("results");
+            String alternativesVar = getKey(the_json_array, "alternatives").toString();
+            String[] parts = alternativesVar.split("\"");
+            addText(parts[3]);
+          }
+        });
+        System.out.println("Speak! If not press again the button!");
+            Thread.sleep(3 * 1000);
+        // closing the WebSockets underlying InputStream will close the WebSocket itself.
+        line.stop();
+        line.close();
+        String actualTalking = label2.getText();
+        actualTalking += "You say: "+TextoTemporal+"\n";
+        /*IA voice by Mbrola*/
+         /*Set the .base of mbrola to mbrola parameter*/
+        System.setProperty("mbrola.base", "mbrola");
+        /*Voice manager Personal variable getting the Instance*/
+        vm = VoiceManager.getInstance();
+        /*Voice define with VoiceManager the voice its choose for IA*/
+        v = vm.getVoice("mbrola_us1");
+        /*Personal Variable Voice allocation*/
+        v.allocate();
+        /*String created as answer by checking the word in the respective file*/
+        String respuesta = checkToExistFile("memory.txt", TextoTemporal);
+        if(respuesta.equalsIgnoreCase("none"))
+        {
+            /*Write the new word in the IA memory*/
+            writeToFile("", "memory.txt", TextoTemporal);
+            /*String that hold the answer if the IA DONT know the word*/
+            String laRespuesta = "I Don`t understand you!";
+            /*Function that make IA chatting IA DONT know the word*/
+            actualTalking += "Atsi say: "+laRespuesta+"\n";
+            /*Personal Variable use mbrola to speech IA DONT know the answer*/
+            v.speak(laRespuesta);
+        }
+        /*If the IA know the word then answer to the User*/
+        else
+        {
+            /*Personal Variable that use mbrola to speech the correct answer */
+            v.speak(respuesta);
+            /*Function that make IA chatting the correct answer*/
+            actualTalking += "Atsi say: "+respuesta+"\n";
+        }
+        label2.setText(actualTalking);
+        jarviA_talk.setText("Ask Again!");
+        micro_speech.setDisable(false);
+    }
+    
+    private Object getKey(JSONArray array, String key)
+    {
+        Object value = null;
+        for (int i = 0; i < array.length(); i++)
+        {
+            JSONObject item = array.getJSONObject(i);
+            if (item.keySet().contains(key))
+            {
+                value = item.get(key);
+                break;
+            }
+        }
+
+        return value;
+    }
+ 
+    private void addText(String newtext)
+    {
+        String TheLabelWriter = label2.getText();
+        TheLabelWriter = "You say: "+newtext+"\n"+TheLabelWriter;
+        TextoTemporal = TheLabelWriter;
+    }
+    
+   /*Public String that check into an arry the name of another string the ask that string have and Read it*/
+    public String checkToExistFile(String FileName, String Ask) throws Exception, IOException
+    {
+        /*Defines a buffer reader of array bucle to input what was readed in file for use IA*/
+        BufferedReader fr = new BufferedReader(new InputStreamReader(new FileInputStream(new File(FileName))));
+        /*String that hold the composition of the string saved into the file awaiting to be readed*/
+        String line;
+        /*Its a void that does an action for bring the line readed the spilter sign for read the Question-Answer and finally get it in correct string for IA*/
+        while((line = fr.readLine()) != null) {
+            /*String that say what splits does for each line*/
+            String[] expLine = line.split("-");
+            /*No Entiendo*/
+            if(expLine[0].equalsIgnoreCase(Ask))
+            {
+                /*No entiendo*/
+                return expLine[1];
+            }
+        }
+        /*Return Nothing*/
+        return "none";
+    }
+    /*Void that write the file by taking some string structure like path name and stat*/
+    public void writeToFile(String path, String fileName, String status) throws Exception, IOException {
+        /*String that hold the text to be saved*/
+        String text = status+"-respuesta"+"\n";
+        /*Path of the file memory*/
+        Path p = Paths.get(path, fileName);
+        /*Check if its possible write the file in the line*/
+        if (Files.isWritable(p)) {
+            /*If its busy the line then made a line jump*/
+            Files.write(p, System.getProperty("line.separator").getBytes(), StandardOpenOption.APPEND);
+            /*And write the string*/
+            Files.write(p, text.getBytes(), StandardOpenOption.APPEND);
+        }else/*If its not posible Write then*/{
+            /*Generate the file*/
+            FileWriter fileWriter = new FileWriter(fileName);
+            /*Defines the new string to print into a new varuable*/
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+            /*Print the string as structure showed Question-Answer*/
+            printWriter.printf("%s-%s", status, "respuesta");
+            /*Finish and Stop the Write process the string its saved with the split!*/
+            printWriter.close();
+        }
+    }
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // TODO
+    }    
+
+}
