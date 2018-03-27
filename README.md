@@ -1,8 +1,14 @@
 # ibm-ia
-Currently, it is only a simple one with the possibility of speaking to one and it responds to both text and voice and works in both directions.
+Basic IA that you can ask with voice(microphone) and IA responds with voice... Also displaying the text spoken by you and IA.
+
+ANOTHER LIBS USED---> They are all IN LIBSY FOLDER AND ALL ARE FOR MBROLA, THE IBM WATSON SPEECH TO TEXT Are Dependencies from POM FILE.
+TEXT TO SPEECH --> Im using Mrbola libs.
+SPEECH TO TEXT --> Im using IBM Watson Speech to Text Api.(If you use my project be sure make an account in IBM Cloud and use your own Api Key Its free.
 
 For now there is only one problem: When I load the libraries as dependencies of "mbrola" (which are the libraries used to pass from text to speech), This is a project "Maven Javafx" and can not load libraries just dependencies,but I have loaded the libraries as dependency and it works does not show dependencies error in the editor... so it works then the api starts well... just showing me these warnings about the libraries:
------------------------------------------------------------------------------------------------
+
+/-----------------------------------------------------------------------------------------------/
+
 The POM for cmutimeawb:cmuutimeawb:jar:4 is missing, no dependency information available
 The POM for mbrola:mbrolaia:jar:4 is missing, no dependency information available
 The POM for cmukal:cmuukal:jar:4 is missing, no dependency information available
@@ -12,13 +18,15 @@ The POM for cmutimelex:cmuutimelex:jar:4 is missing, no dependency information a
 The POM for enuslang:enuslang4:jar:4 is missing, no dependency information available
 The POM for freetts:freeetts:jar:4 is missing, no dependency information available
 The POM for jaspifreetts:jasppifreetts:jar:4 is missing, no dependency information available
-------------------------------------------------------------------------------------------------
+
+/------------------------------------------------------------------------------------------------/
 
 They appears as Warnings dont shut down the App.
 
 But when i try to run acctualy the part where this libraries have to work they wont saying me these error messages:
 
-----------------------------------------------------------------------------------------------------------------
+/----------------------------------------------------------------------------------------------------------------/
+
 Exception in thread "JavaFX Application Thread" java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
 	at javafx.fxml.FXMLLoader$MethodHandler.invoke(FXMLLoader.java:1774)
 	at javafx.fxml.FXMLLoader$ControllerMethodEventHandler.handle(FXMLLoader.java:1657)
@@ -84,6 +92,7 @@ Caused by: java.lang.reflect.InvocationTargetException
 Caused by: java.lang.NullPointerException
 	at com.jarvia.jarvia.FXMLController.handleButtonAction(FXMLController.java:103)
 	... 58 more
-  ----------------------------------------------------------------------------------------------------------------
+	
+  /----------------------------------------------------------------------------------------------------------------/
   
 If someone know how i can charge better the libraries in a maven javafx project please just let a coment or something my email its : ftw.dcross@gmail.com
