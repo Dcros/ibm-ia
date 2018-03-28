@@ -66,7 +66,7 @@ public class FXMLController implements Initializable {
 
         RecognizeOptions options = new RecognizeOptions.Builder()
           .interimResults(true)
-        //.inactivityTimeout(5) // use this to stop listening when the speaker pauses, i.e. for 5s
+          //.inactivityTimeout(3) // use this to stop listening when the speaker pauses, i.e. for 5s
           .audio(audio)
           .contentType(HttpMediaType.AUDIO_RAW + "; rate=" + sampleRate)
           .build();
@@ -74,40 +74,46 @@ public class FXMLController implements Initializable {
         service.recognizeUsingWebSocket(options, new BaseRecognizeCallback() {
           @Override
           public void onTranscription(SpeechRecognitionResults speechResults) {
-            JSONObject myjson = new JSONObject(speechResults);
-            JSONArray the_json_array = myjson.getJSONArray("results");
-            String alternativesVar = getKey(the_json_array, "alternatives").toString();
-            String[] parts = alternativesVar.split("\"");
-            addText(parts[3]);
-            addTextToVoice(parts[3]);
+            System.out.println(speechResults);
+            if(speechResults.toString().indexOf("\"results\": []") == -1)
+            {
+                JSONObject myjson = new JSONObject(speechResults);
+                JSONArray the_json_array = myjson.getJSONArray("results");
+                String alternativesVar = getKey(the_json_array, "alternatives").toString();
+                String[] parts = alternativesVar.split("\"");
+                addText(parts[3], 2);
+                addTextToVoice(parts[3]);
+            }
           }
         });
         System.out.println("Speak! If not press again the button!");
-            Thread.sleep(3 * 1000);
+            Thread.sleep(5 * 1000);
         // closing the WebSockets underlying InputStream will close the WebSocket itself.
         line.stop();
         line.close();
-        String actualTalking = label2.getText();
-        actualTalking += TextoTemporal;
-        String respuestaas = checkToExistFile("memory.txt", LarespuestaVoice);
-        if(respuestaas.equalsIgnoreCase("none"))
+        label2.setText(TextoTemporal);
+        if (LarespuestaVoice != "")
         {
-            /*Write the new word in the IA memory*/
-            writeToFile("", "memory.txt", LarespuestaVoice);
-            /*String that hold the answer if the IA DONT know the word*/
-            String laRespuesta = "I Don`t understand you!";
-            /*Function that make IA chatting IA DONT know the word*/
-            actualTalking += "Atsi say: "+laRespuesta+"\n";
-            /*Personal Variable use mbrola to speech IA DONT know the answer*/
+            String respuestaas = checkToExistFile("memory.txt", LarespuestaVoice);
+            if(respuestaas.equalsIgnoreCase("none"))
+            {
+                /*Write the new word in the IA memory*/
+                writeToFile("", "memory.txt", LarespuestaVoice);
+                /*String that hold the answer if the IA DONT know the word*/
+                String laRespuesta = "I Don`t understand you!";
+                /*Function that make IA chatting IA DONT know the word*/
+                addText(laRespuesta, 1);
+                /*Personal Variable use mbrola to speech IA DONT know the answer*/
+            }
+            /*If the IA know the word then answer to the User*/
+            else
+            {
+                /*Personal Variable that use mbrola to speech the correct answer */
+                /*Function that make IA chatting the correct answer*/
+                addText(respuestaas, 1);
+            }
+            label2.setText(TextoTemporal);
         }
-        /*If the IA know the word then answer to the User*/
-        else
-        {
-            /*Personal Variable that use mbrola to speech the correct answer */
-            /*Function that make IA chatting the correct answer*/
-            actualTalking += "Jarvia say: "+respuestaas+"\n";
-        }
-        label2.setText(actualTalking);
         micro_speech.setDisable(false);
         jarviA_talk.setText("Ask Again!");
         LarespuestaVoice = "";
@@ -129,15 +135,19 @@ public class FXMLController implements Initializable {
         return value;
     }
  
-    public void addText(String newtext)
+    public void addText(String newtext, Integer Speak)
     {
         String inputmic = label2.getText();
         String TheLabelWriter = inputmic;
         String TheIARespond = inputmic;
         String respuesta = inputmic;
         respuesta = newtext+"\n"+inputmic;
-        TheIARespond = "Jarvia say: "+newtext+"\n"+inputmic;
-        TheLabelWriter = "You say: "+newtext+"\n"+inputmic;
+        if(Speak == 1)
+        {
+            TheLabelWriter = "Jarvia say: "+newtext+"\n"+TheLabelWriter;
+        }else if(Speak == 2){
+            TheLabelWriter = "You say: "+newtext+"\n"+TheLabelWriter;
+        }
         TextoTemporal = TheLabelWriter;
         LaRespuestaIA = TheIARespond;
         Larespuesta = respuesta;
