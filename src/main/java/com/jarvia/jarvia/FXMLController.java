@@ -21,9 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -32,9 +30,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.sun.speech.freetts.Voice;
-import com.sun.speech.freetts.VoiceManager;
-
 public class FXMLController implements Initializable {
     @FXML
     private Label jarviA_talk;
@@ -43,8 +38,9 @@ public class FXMLController implements Initializable {
     @FXML
     private Label label2;
     public String TextoTemporal;
-    VoiceManager vm;
-    Voice v;
+    public String LaRespuestaIA;
+    public String Larespuesta;
+    public String LarespuestaVoice;
     
     @FXML
     public void handleButtonAction(ActionEvent event) throws InterruptedException, LineUnavailableException, Exception {
@@ -83,6 +79,7 @@ public class FXMLController implements Initializable {
             String alternativesVar = getKey(the_json_array, "alternatives").toString();
             String[] parts = alternativesVar.split("\"");
             addText(parts[3]);
+            addTextToVoice(parts[3]);
           }
         });
         System.out.println("Speak! If not press again the button!");
@@ -91,40 +88,29 @@ public class FXMLController implements Initializable {
         line.stop();
         line.close();
         String actualTalking = label2.getText();
-        actualTalking += "You say: "+TextoTemporal+"\n";
-        /*IA voice by Mbrola*/
-         /*Set the .base of mbrola to mbrola parameter*/
-        System.setProperty("mbrola.base", "mbrola");
-        /*Voice manager Personal variable getting the Instance*/
-        vm = VoiceManager.getInstance();
-        /*Voice define with VoiceManager the voice its choose for IA*/
-        v = vm.getVoice("mbrola_us1");
-        /*Personal Variable Voice allocation*/
-        v.allocate();
-        /*String created as answer by checking the word in the respective file*/
-        String respuesta = checkToExistFile("memory.txt", TextoTemporal);
-        if(respuesta.equalsIgnoreCase("none"))
+        actualTalking += TextoTemporal;
+        String respuestaas = checkToExistFile("memory.txt", LarespuestaVoice);
+        if(respuestaas.equalsIgnoreCase("none"))
         {
             /*Write the new word in the IA memory*/
-            writeToFile("", "memory.txt", TextoTemporal);
+            writeToFile("", "memory.txt", LarespuestaVoice);
             /*String that hold the answer if the IA DONT know the word*/
             String laRespuesta = "I Don`t understand you!";
             /*Function that make IA chatting IA DONT know the word*/
             actualTalking += "Atsi say: "+laRespuesta+"\n";
             /*Personal Variable use mbrola to speech IA DONT know the answer*/
-            v.speak(laRespuesta);
         }
         /*If the IA know the word then answer to the User*/
         else
         {
             /*Personal Variable that use mbrola to speech the correct answer */
-            v.speak(respuesta);
             /*Function that make IA chatting the correct answer*/
-            actualTalking += "Atsi say: "+respuesta+"\n";
+            actualTalking += "Jarvia say: "+respuestaas+"\n";
         }
         label2.setText(actualTalking);
-        jarviA_talk.setText("Ask Again!");
         micro_speech.setDisable(false);
+        jarviA_talk.setText("Ask Again!");
+        LarespuestaVoice = "";
     }
     
     private Object getKey(JSONArray array, String key)
@@ -143,11 +129,24 @@ public class FXMLController implements Initializable {
         return value;
     }
  
-    private void addText(String newtext)
+    public void addText(String newtext)
     {
-        String TheLabelWriter = label2.getText();
-        TheLabelWriter = "You say: "+newtext+"\n"+TheLabelWriter;
+        String inputmic = label2.getText();
+        String TheLabelWriter = inputmic;
+        String TheIARespond = inputmic;
+        String respuesta = inputmic;
+        respuesta = newtext+"\n"+inputmic;
+        TheIARespond = "Jarvia say: "+newtext+"\n"+inputmic;
+        TheLabelWriter = "You say: "+newtext+"\n"+inputmic;
         TextoTemporal = TheLabelWriter;
+        LaRespuestaIA = TheIARespond;
+        Larespuesta = respuesta;
+        
+    }
+    
+    public void addTextToVoice(String newtext){
+    
+        LarespuestaVoice = newtext;
     }
     
    /*Public String that check into an arry the name of another string the ask that string have and Read it*/
@@ -162,7 +161,9 @@ public class FXMLController implements Initializable {
             /*String that say what splits does for each line*/
             String[] expLine = line.split("-");
             /*No Entiendo*/
-            if(expLine[0].equalsIgnoreCase(Ask))
+            
+            String newask = Ask.substring(0, Ask.length()-1);
+            if(expLine[0].indexOf( Ask ) != -1)
             {
                 /*No entiendo*/
                 return expLine[1];
@@ -174,7 +175,7 @@ public class FXMLController implements Initializable {
     /*Void that write the file by taking some string structure like path name and stat*/
     public void writeToFile(String path, String fileName, String status) throws Exception, IOException {
         /*String that hold the text to be saved*/
-        String text = status+"-respuesta"+"\n";
+        String text = status+"-respuestaas"+"\n";
         /*Path of the file memory*/
         Path p = Paths.get(path, fileName);
         /*Check if its possible write the file in the line*/
@@ -189,7 +190,7 @@ public class FXMLController implements Initializable {
             /*Defines the new string to print into a new varuable*/
             PrintWriter printWriter = new PrintWriter(fileWriter);
             /*Print the string as structure showed Question-Answer*/
-            printWriter.printf("%s-%s", status, "respuesta");
+            printWriter.printf("%s-%s", status, "respuestaas");
             /*Finish and Stop the Write process the string its saved with the split!*/
             printWriter.close();
         }

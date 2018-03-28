@@ -30,51 +30,6 @@
             <artifactId>java-sdk</artifactId>
             <version>5.1.1</version>
         </dependency>
-        <dependency>
-            <groupId>cmutimeawb</groupId>
-            <artifactId>cmuutimeawb</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>mbrola</groupId>
-            <artifactId>mbrolaia</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>cmukal</groupId>
-            <artifactId>cmuukal</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>cmudict4</groupId>
-            <artifactId>cmuudict4</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>cmulex</groupId>
-            <artifactId>cmuulex</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>cmutimelex</groupId>
-            <artifactId>cmuutimelex</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>enuslang</groupId>
-            <artifactId>enuslang4</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>freetts</groupId>
-            <artifactId>freeetts</artifactId>
-            <version>4</version>
-        </dependency>
-        <dependency>
-            <groupId>jaspifreetts</groupId>
-            <artifactId>jasppifreetts</artifactId>
-            <version>4</version>
-        </dependency>
     </dependencies>
     <organization>
         <!-- Used as the 'Vendor' for JNLP generation -->
