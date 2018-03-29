@@ -4,7 +4,8 @@ Basic IA that you can ask with voice(microphone) and IA responds with "voice"(Wo
 TEXT TO SPEECH --> Im Working now on it, im gona use IBM Text to Speech.
 SPEECH TO TEXT --> Im using IBM Watson Speech to Text Api.(If you use my project be sure make an account in IBM Cloud and use your own Api Key Its free.
 
-For now there is only one problem: -Add New Text - Speech to give IA a voice when she answer.
+For now there is only 2 main problem: -Add New Text - Speech to give IA a voice when she answer and frist time when app charge if dont say nothing into mic the app crash but if you ask once to IA then make a second ask then it dont crash.
+---------------
 
 
 Install:
