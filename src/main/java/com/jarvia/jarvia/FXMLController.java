@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Calendar;
+import java.util.Formatter;
 import javafx.scene.control.Button;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -75,19 +77,27 @@ public class FXMLController implements Initializable {
           @Override
           public void onTranscription(SpeechRecognitionResults speechResults) {
             System.out.println(speechResults);
+            
             if(speechResults.toString().indexOf("\"results\": []") == -1)
             {
+                jarviA_talk.setText("Talk now please");
                 JSONObject myjson = new JSONObject(speechResults);
                 JSONArray the_json_array = myjson.getJSONArray("results");
                 String alternativesVar = getKey(the_json_array, "alternatives").toString();
                 String[] parts = alternativesVar.split("\"");
                 addText(parts[3], 2);
                 addTextToVoice(parts[3]);
+            }else
+            {
+                
+                jarviA_talk.setText("Please talk!");
+                label2.setText("I cant hear you!");
+            
             }
           }
         });
         System.out.println("Speak! If not press again the button!");
-            Thread.sleep(5 * 1000);
+            Thread.sleep(3 * 1000);
         // closing the WebSockets underlying InputStream will close the WebSocket itself.
         line.stop();
         line.close();
@@ -141,12 +151,16 @@ public class FXMLController implements Initializable {
         String TheLabelWriter = inputmic;
         String TheIARespond = inputmic;
         String respuesta = inputmic;
+        Formatter fmt = new Formatter();
+        Calendar cal = Calendar.getInstance();
+        fmt = new Formatter();
+        fmt.format("(%tl:%tM:%tS) ", cal, cal, cal);
         respuesta = newtext+"\n"+inputmic;
         if(Speak == 1)
         {
-            TheLabelWriter = "Jarvia say: "+newtext+"\n"+TheLabelWriter;
+            TheLabelWriter = fmt+"Jarvia say: "+newtext+"\n"+TheLabelWriter;
         }else if(Speak == 2){
-            TheLabelWriter = "You say: "+newtext+"\n"+TheLabelWriter;
+            TheLabelWriter = fmt+"You say: "+newtext+"\n"+TheLabelWriter;
         }
         TextoTemporal = TheLabelWriter;
         LaRespuestaIA = TheIARespond;
@@ -208,7 +222,21 @@ public class FXMLController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        /*String that hold the text into the text input*/
+        String texto=label2.getText();
+        /*Little check to advantage and exception spaces or none into text input to avoid take it as actual writing*/
+        texto=texto.replaceAll(" ", "");
+        /*Check if the text into the text input its null or 0*/
+        if(texto.length()==0){
+            /*If into the text input its nothing writed then print into app label a mesake from Ia that challange user to write something*/
+            jarviA_talk.setText("Talk To me!");
+            label2.setText("Press Micro and say something!");
+        }
+        /*If its a text in the text input*/
+        else
+        {
+            label2.setText("Press Micro and say something!");
+        }
     }    
 
 }

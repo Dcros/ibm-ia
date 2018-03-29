@@ -1,3 +1,31 @@
 .button {
-    -fx-font-weight: bold;
+    
+    -fx-background-color:#ff6600;
 }
+
+.root{
+    
+    -fx-background-color:#050000;
+}
+
+.scroll-pane > .viewport {
+   -fx-background-color: #ff6600;
+   -fx-background-radius: 10;
+}
+
+.scroll-pane{
+    -fx-background-color: #ff6600;
+    -fx-background-radius: 6;
+    
+}
+
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: black;
+    -fx-background-radius: 5em;
+}
+

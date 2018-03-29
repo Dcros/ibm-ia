@@ -18,6 +18,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         stage.setTitle("Jarvia");
+        stage.setOpacity(0.9);
         stage.setScene(scene);
         stage.show();
     }
